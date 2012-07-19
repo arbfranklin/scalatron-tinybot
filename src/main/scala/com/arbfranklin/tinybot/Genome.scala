@@ -31,7 +31,7 @@ import collection.mutable
  * the properties that define how this tinybot operates, every property is a double value between 0 and 1. The current
  * constants have been deduced through trial runs of {@link TinyBotGA}.
  */
-class Genome(props: mutable.Map[String, Double]) {
+class Genome private(props: mutable.Map[String, Double]) {
   /** master bot properties */
   val master = new Bundle {
     // unfortunately the winning strategy is very much to spawn as much as you can
@@ -126,6 +126,13 @@ class Genome(props: mutable.Map[String, Double]) {
     }
   }
 
+  private def get(k: String, default: Double): Double = {
+    if (!props.contains(k)) {
+      props.put(k, default)
+    }
+    props.getOrElse(k, default)
+  }
+
   //
   // IMPL
   //
@@ -133,13 +140,6 @@ class Genome(props: mutable.Map[String, Double]) {
   def keys = props.keys.toList.sorted
 
   def get(k: String): Double = props(k)
-
-  def get(k: String, default: Double): Double = {
-    if (!props.contains(k)) {
-      props.put(k, default)
-    }
-    props.getOrElse(k, default)
-  }
 
   /** mate this genome with the provided one */
   def mate(partner: Genome): Genome = {
