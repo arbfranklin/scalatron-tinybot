@@ -1,6 +1,3 @@
-tinybot
-=======
-
 This is the home of "tinybot", an implementation of a [Scalatron](http://scalatron.github.com) bot.
 
 The general approach of tinybot is as follows:
@@ -9,8 +6,4 @@ The general approach of tinybot is as follows:
 * All strategies and associated moves are weighted using a "Genome" for the run.
 * tinybot can self tune its "Genome" by running using a genetic algorithm style approach.
 
-This is my first Scala project, so any code improvements/suggestions would be helpful!
-
-## License
-
-tinybot is licensed under the Simplified BSD License.
+This is my first Scala project, so any code improvements and/or suggestions would be helpful!
