@@ -42,7 +42,7 @@ class SlaveSpawn(frequency: Double, imbalance: Int, maxBots: Int) extends Strate
   /** Minimum energy required for a split */
   val EnergyForSplit = 200
 
-  override def name = "*spawn*"
+  override def name = "*fork*"
 
   override def eval(ctx: ReactContext, moves: Set[Move]) = {
     if (spawn(ctx)) {

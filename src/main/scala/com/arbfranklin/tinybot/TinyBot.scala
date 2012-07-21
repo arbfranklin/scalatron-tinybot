@@ -92,7 +92,7 @@ class TinyBot(val g: Genome) extends BotResponder {
     actions.map(a => {
       if (a.isInstanceOf[Status]) {
         val msg = a.asInstanceOf[Status].text
-        if (msg == "home" || msg == "*spawn*") a else Status("")
+        if (msg.startsWith("*")) a else Status("")
       } else a
     })
   }

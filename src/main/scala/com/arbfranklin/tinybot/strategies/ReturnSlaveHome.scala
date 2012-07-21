@@ -41,7 +41,7 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
   /** should all bots return home now */
   var globalRecall = false
 
-  override def name = "home"
+  override def name = "*home*"
 
   /**evaluate against the given context and provide a serious of potential actions and their associated score */
   override def eval(ctx: ReactContext, moves: Set[Move]) = {
