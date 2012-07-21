@@ -36,10 +36,7 @@ class Genome private(props: mutable.Map[String, Double]) {
   val master = new Bundle {
     // unfortunately the winning strategy is very much to spawn as much as you can
     val spawn = new Bundle {
-      val frequency = get("master/spawn:freq", 0.8646)
-      val cost = (get("master/spawn:cost", 0.0353) * 10000).toInt + 100
-      val minBefore = (get("master/spawn:minBefore", 0.0170) * 10000).toInt + 100
-      val maxBots = (get("master/spawn:maxBots", 0.51) * 1000).toInt
+      val maxBots = (get("master/spawn:maxBots", 0.1) * 500).toInt
     }
 
     val avoidEnergyLoss = new Bundle {
@@ -79,10 +76,8 @@ class Genome private(props: mutable.Map[String, Double]) {
   /** mini-bot properties */
   val slave = new Bundle {
     val spawn = new Bundle {
-      val frequency = get("slave/spawn:freq", 0.8646)
-      val cost = (get("slave/spawn:cost", 0.0) * 10000).toInt + 100
-      val minBefore = (get("slave/spawn:minBefore", 0.005) * 10000).toInt + 100
-      val ratio = 1d / get("slave/spawn:ratio", 0.338)
+      val frequency = get("slave/spawn:freq", 0.99)
+      val imbalance = (get("slave/spawn:imbalance", 0.1) * 10).toInt
     }
 
     val avoidEnergyLoss = new Bundle {
@@ -104,7 +99,7 @@ class Genome private(props: mutable.Map[String, Double]) {
     val home = new Bundle {
       val weight = get("slave/home:weight", 0.9809)
       val roi = (get("slave/home:roi", 0.2319) * 100).toInt
-      val safetyMargin = get("slave/home:safetyMargin", 0.3) * 6
+      val safetyMargin = get("slave/home:safetyMargin", 0.34) * 10
     }
 
     val random = new Bundle {
@@ -119,6 +114,10 @@ class Genome private(props: mutable.Map[String, Double]) {
       val minTurns = (get("slave/apocalypse:minTurns", 0.78) * 10).toInt
     }
 
+    val antibump = new Bundle {
+      val weight = get("slave/antibump:weight", 0.5)
+    }
+
     val attack = new Bundle {
       val radius = (get("slave/attack:radius", 0.2) * 5).toInt + 2 // 2 - 7
       val maxEnergy = (get("slave/attack:maxEnergy", 0.5) * 2000).toInt
@@ -126,16 +125,22 @@ class Genome private(props: mutable.Map[String, Double]) {
     }
   }
 
+  val shared = new Bundle {
+    val spawn = new Bundle {
+      val maxBots = (get("shared/spawn:maxBots", 0.51) * 1000).toInt
+    }
+  }
+
+  //
+  // IMPL
+  //
+
   private def get(k: String, default: Double): Double = {
     if (!props.contains(k)) {
       props.put(k, default)
     }
     props.getOrElse(k, default)
   }
-
-  //
-  // IMPL
-  //
 
   def keys = props.keys.toList.sorted
 

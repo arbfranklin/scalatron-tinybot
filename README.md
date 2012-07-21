@@ -6,4 +6,11 @@ The general approach of tinybot is as follows:
 * All strategies and associated moves are weighted using a "Genome" for the run.
 * tinybot can self tune its "Genome" by running using a genetic algorithm style approach.
 
-This is my first Scala project, so any code improvements and/or suggestions would be helpful!
+This is my first Scala project, so any code improvements/suggestions would be helpful!
+
+## News
+* *19 July 2012* - 12.3 million, validated score of tinybot 1.0 on the [freestyle benchmark](http://scalatron.github.com/pages/benchmark.html).
+
+## License
+
+tinybot is licensed under the Simplified BSD License.

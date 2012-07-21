@@ -76,7 +76,7 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
         val b = path.take(2).last
         val move = Move(b.x - a.x, b.y - a.y)
 
-        val score = if (eol) Score.Mandate else Score.High
+        val score = if (eol) Score(0.9999) else Score.High
 
         Vote(move, score, name)
       }

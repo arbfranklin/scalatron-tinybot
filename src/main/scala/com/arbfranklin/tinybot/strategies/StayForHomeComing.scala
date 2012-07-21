@@ -28,17 +28,16 @@ package com.arbfranklin.tinybot.strategies
 import com.arbfranklin.tinybot.util._
 
 /**
- * Nearing the apocalypse we want the master to stay pretty stagnant to avoid having mini-bots chase the master and
- * therefore lengthening their trip home.
+ * Nearing the apocalypse we want the master to chase the nearest mini-bot to bring them home faster.
  */
-class StayForHomeComing(minTurns: Int) extends Strategy {
+class StayForHomeComing(minTurns: Int) extends Hunter(Tile.MiniBot) {
   /**a human readable name for the strategy */
   override def name = "stay"
 
-  /**evaluate against the given contect and provide a serious of potential actions and their associated score */
+  /**evaluate against the given context and provide a serious of potential actions and their associated score */
   override def eval(ctx: ReactContext, moves: Set[Move]) = {
     if (ctx.tillApocalypse <= minTurns) {
-      Vote(Move.Center, Score.High, name)
+      super.eval(ctx,moves)
     } else {
       Vote.Abstain
     }

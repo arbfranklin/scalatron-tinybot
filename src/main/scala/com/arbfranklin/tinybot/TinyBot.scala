@@ -35,7 +35,7 @@ import collection.GenIterable
  */
 class TinyBot(val g: Genome) extends BotResponder {
   /**weighted strategies to use for reducing the choice of next move */
-  val masterStrategies: Map[Strategy, Double] = Map(
+  val masterStrategies = Map(
     new AvoidEnergyLoss() -> g.master.avoidEnergyLoss.weight,
     new FairHunter(Zugar) -> g.master.huntZugars.weight,
     new FairHunter(Fluppet) -> g.master.huntFluppets.weight,
@@ -44,10 +44,10 @@ class TinyBot(val g: Genome) extends BotResponder {
     new RandomMove() -> g.master.random.weight,
     new VelocityMove() -> g.master.velocity.weight,
     new StayForHomeComing(g.master.stay.minTurns) -> g.master.stay.weight,
-    new MasterSpawn(g.master.spawn.frequency, g.master.spawn.minBefore, g.master.spawn.cost, g.master.spawn.maxBots) -> 1
-  )
+    new MasterSpawn(g.master.spawn.maxBots) -> 1d
+  ).toList
 
-  val slaveStrategies: Map[Strategy, Double] = Map(
+  val slaveStrategies = Map(
     new AvoidEnergyLoss() -> g.slave.avoidEnergyLoss.weight,
     new FairHunter(Zugar) -> g.slave.huntZugars.weight,
     new FairHunter(Fluppet) -> g.slave.huntFluppets.weight,
@@ -55,11 +55,11 @@ class TinyBot(val g: Genome) extends BotResponder {
     new RandomMove() -> g.slave.random.weight,
     new VelocityMove() -> g.slave.velocity.weight,
     new ReturnSlaveHome(g.slave.home.roi, g.slave.home.safetyMargin) -> g.slave.home.weight,
-    new StuckKamakazi() -> 1,
-    new ExplodeOnApocalypse(g.slave.apocalypse.minTurns) -> 1,
-    new SlaveSpawn(g.slave.spawn.frequency, g.slave.spawn.minBefore, g.slave.spawn.cost, g.slave.spawn.ratio) -> 1,
-    new AttackBots(g.slave.attack.radius, g.slave.attack.minCount, g.slave.attack.maxEnergy) -> 1
-  )
+    new StuckKamakazi() -> 1d,
+    new ExplodeOnApocalypse(g.slave.apocalypse.minTurns) -> 1d,
+    new SlaveSpawn(g.slave.spawn.frequency, g.slave.spawn.imbalance, g.shared.spawn.maxBots) -> 1d,
+    new AttackBots(g.slave.attack.radius, g.slave.attack.minCount, g.slave.attack.maxEnergy) -> 1d
+  ).toList
 
   var startTime = 0L
 
@@ -102,7 +102,7 @@ class TinyBot(val g: Genome) extends BotResponder {
   //
 
   /**evaluation handler */
-  def eval(ctx: ReactContext, strategies: Map[Strategy, Double]): List[Action] = {
+  def eval(ctx: ReactContext, strategies: List[(Strategy,Double)]): List[Action] = {
     // collate all the various actions that we could make
     val actions = collateActions(ctx, strategies)
 
@@ -141,7 +141,7 @@ class TinyBot(val g: Genome) extends BotResponder {
   }
 
   /**collate all the potential actions */
-  def collateActions(ctx: ReactContext, strategies: Map[Strategy, Double]): GenIterable[Vote] = {
+  def collateActions(ctx: ReactContext, strategies: List[(Strategy,Double)]): GenIterable[Vote] = {
     // TODO: apply parallel collections? Slower on my mac, but maybe not on a high-end server?
     val allowedMoves = Move.values.filter(m => ctx.view.at(ctx.view.toXY(m)) != Tile.Wall).toSet
 

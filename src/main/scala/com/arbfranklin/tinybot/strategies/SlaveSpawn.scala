@@ -28,36 +28,54 @@ package com.arbfranklin.tinybot.strategies
 import com.arbfranklin.tinybot.util._
 
 /**
- * A spawning strategy for mini-bots. If a mini-bot detects that it's vicinity is "resource rich but hunter poor" it
- * will spawn additional mini-bots to help hunt the vicinity.
+ * A spawning strategy for mini-bots. If a mini-bot detects that it's the closest to a number of resources
+ * "resource rich but hunter poor", it will spawn additional mini-bots to help hunt the vicinity.  The new
+ * implementation evenly divides it's energy allocation to the new spawn.
  */
-class SlaveSpawn(frequency: Double, minForSpawn: Int, childEnergy: Int, ratio: Double) extends Strategy {
+class SlaveSpawn(frequency: Double, imbalance: Int, maxBots: Int) extends Strategy {
   /** randomizer for breaking up frequency of spawn */
   val rand = scala.util.Random
 
   /** how many turns relative to the apocalypse should we stop spawning? */
   val MinTurnsRemaining = 50
 
+  /** Minimum energy required for a split */
+  val EnergyForSplit = 200
+
   override def name = "*spawn*"
 
   override def eval(ctx: ReactContext, moves: Set[Move]) = {
     if (spawn(ctx)) {
-      Vote(Spawn(Move.Center, childEnergy), Score.Mandate, name)
+      // pure sub-division
+      Vote(Spawn(Move.Center, ctx.energy/2), Score.Mandate, name)
     } else {
       Vote.Abstain
     }
   }
 
   def spawn(ctx: ReactContext): Boolean = {
-    if (ctx.energy < minForSpawn) return false
+    if (ctx.energy < EnergyForSplit) return false
     if (ctx.tillApocalypse <= MinTurnsRemaining) return false
     if (rand.nextDouble() > frequency) return false
+    if (ctx.botCount >= maxBots) return false
 
-    // count zugars and fluppets vs potential huntsman
-    val view = ctx.view
-    val resources = view.find(Set(Tile.Zugar, Tile.Fluppet)).size
-    val hunters = view.find(Set(Tile.MiniBot, Tile.OtherMiniBot)).size // only include minis which are the same speed as us
+    val hunters = ctx.view.find(Tile.MiniBot)
+    if (!hunters.isEmpty) {
+      // count zugars and fluppets vs potential huntsman
+      val resources = ctx.view.find(Set(Tile.Zugar, Tile.Fluppet)).sortBy(xy => ctx.distTo(xy))
 
-    (resources / (hunters + 1)) > ratio
+      // how many resources am i the closest to?
+      val count = resources.foldLeft(0){ (c,p) =>
+        val dist = ctx.distTo(p)
+
+        // is there a hunter who is closer?
+        val shortest = hunters.map(h => h.distTo(p)).min
+        if (dist <= shortest) c+1 else c
+      }
+
+      count > imbalance
+    } else {
+      ctx.view.find(Set(Tile.Zugar, Tile.Fluppet)).size > imbalance
+    }
   }
 }

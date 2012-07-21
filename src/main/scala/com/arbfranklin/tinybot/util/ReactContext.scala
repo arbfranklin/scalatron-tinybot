@@ -37,6 +37,9 @@ abstract class ReactContext(val view: View, params: Map[String, String]) {
   /** last move */
   def lastMove: Move = if (params.contains("lastMove")) Move(params("lastMove")) else Move.Center
 
+  /** did the previous move result in a collision? */
+  def isCollision: Option[Move] = if (params.contains("collision")) Some(Move(params("collision"))) else None
+
   /** iteration number */
   def time = params("time").toInt
 
