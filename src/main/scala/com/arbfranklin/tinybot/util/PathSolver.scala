@@ -28,7 +28,7 @@ package com.arbfranklin.tinybot.util
 import collection._
 
 trait PathSolver {
-  def solve(): List[XY]
+  def solve(): List[Move]
 }
 
 /**
@@ -42,7 +42,7 @@ class AStarSearch(view: View, start: XY, goal: XY) extends PathSolver {
   /**bad tile def */
   def isBad(t: Tile.Tile) = (t == Tile.Wall || t == Tile.Toxifera || t == Tile.MiniBot)
 
-  def solve(): List[XY] = {
+  def solve(): List[Move] = {
     val closedSet = mutable.Set[XY]()
     val openSet = mutable.Set[XY](start)
     val cameFrom = mutable.OpenHashMap[XY, XY]()
@@ -53,8 +53,10 @@ class AStarSearch(view: View, start: XY, goal: XY) extends PathSolver {
     while (!openSet.isEmpty) {
       // the node in openset having the lowest f_score[] value
       val current = openSet.minBy(x => fScore(x))
-      if (current == goal)
-        return reconstructPath(cameFrom, goal)
+      if (current == goal) {
+        val path = reconstructPath(cameFrom, goal)
+        return List(path(1)-path(0))
+      }
 
       openSet.remove(current)
       closedSet.add(current)

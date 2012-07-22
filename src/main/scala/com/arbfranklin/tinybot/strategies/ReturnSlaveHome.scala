@@ -48,48 +48,34 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
     val slave = ctx.asInstanceOf[SlaveContext]
 
     /** roi obtained? */
-    def roiReached = slave.energy > (slave.startEnergy * roi)
+    val roiReached = slave.energy > (slave.startEnergy * roi)
 
     // nearing the end, we want to race home regardless of ROI
     def eol: Boolean = {
-      if (globalRecall) return true
+      if (!globalRecall) {
+        val turnsRemaining = ctx.apocalypse - ctx.time
+        val distHome = ctx.distTo(slave.master)
 
-      val turnsRemaining = ctx.apocalypse - ctx.time
-      val distHome = ctx.distTo(slave.master)
-
-      /**when we are almost out of time, we need this many turns times the dist count to make it back */
-      if (turnsRemaining < (distHome * turnHomeMargin)) {
-        globalRecall = true
-        true
-      } else {
-        false
+        // when we are almost out of time, we need this many turns times the dist count to make it back
+        globalRecall = turnsRemaining < (distHome * turnHomeMargin)
       }
+      globalRecall
     }
 
     if (roiReached || eol) {
-      val path = pathHome(ctx.view, slave.master)
-
-      if (path.isEmpty) {
+      val moves = solve(ctx.view, slave.master)
+      if (moves.isEmpty) {
         Vote.Abstain
       } else {
-        val a = ctx.view.center
-        val b = path.take(2).last
-        val move = Move(b.x - a.x, b.y - a.y)
-
         val score = if (eol) Score(0.9999) else Score.High
-
-        Vote(move, score, name)
+        moves.map(m => Vote(m, score, name))
       }
     } else {
       Vote.Abstain
     }
   }
 
-  def pathHome(view: View, goal: XY): List[XY] = {
-    // go to the tile on the edge
-    val bx = if (goal.x < 0) 0 else if (goal.x >= view.cols) view.cols - 1 else goal.x
-    val by = if (goal.y < 0) 0 else if (goal.y >= view.cols) view.cols - 1 else goal.y
-
-    new AStarSearch(view, view.center, XY(bx, by)).solve()
+  def solve(view: View, goal: XY) = {
+    new AStarSearch(view, view.center, view.bounded(goal)).solve()
   }
 }

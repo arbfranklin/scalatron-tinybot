@@ -76,6 +76,14 @@ class View(val cols: Int, cells: Array[Tile]) {
     pos.x >= 0 && pos.x < cols && pos.y >= 0 && pos.y < cols
   }
 
+  /** @return a point that is potentially outside the view bounded to the view extents */
+  def bounded(xy: XY): XY = {
+    // go to the tile on the edge
+    val bx = if (xy.x < 0) 0 else if (xy.x >= cols) cols - 1 else xy.x
+    val by = if (xy.y < 0) 0 else if (xy.y >= cols) cols - 1 else xy.y
+    XY(bx,by)
+  }
+
   private def toInt(xy: XY) = xy.y * cols + xy.x
 
   private def toXY(n: Int) = {

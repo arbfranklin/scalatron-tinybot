@@ -27,6 +27,7 @@ package com.arbfranklin.tinybot.util
 
 case class XY(x: Int, y: Int) {
   def +(m: Move): XY = new XY(x + m.right, y + m.down)
+  def -(xy: XY): Move = Move(x-xy.x,y-xy.y)
 
   def dx(o: XY): Int = math.abs(x - o.x)
 
