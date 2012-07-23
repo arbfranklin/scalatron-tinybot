@@ -26,9 +26,27 @@
 package com.arbfranklin.tinybot.util
 
 import collection._
+import PathSolver._
 
 trait PathSolver {
-  def solve(): List[Move]
+  def solve(): Set[Move]
+}
+
+object PathSolver {
+  def apply(view: View, start: XY, goal: XY): PathSolver = new AStarSearch(view, start, goal)
+
+  /**val move set */
+  val moves = Move.values - Move.Center
+
+  /**bad tile def */
+  def isBad(t: Tile.Tile) = (t == Tile.Wall || t == Tile.Toxifera || t == Tile.MiniBot)
+
+  /** find the neighbouring squares of xy */
+  def neighbours(view: View, xy: XY) = {
+    moves.map(xy + _).filter(p => {
+      !isBad(view.at(p)) && view.isBounded(p)
+    })
+  }
 }
 
 /**
@@ -36,13 +54,7 @@ trait PathSolver {
  * Based on pseudocode at: http://en.wikipedia.org/wiki/A*_search_algorithm
  */
 class AStarSearch(view: View, start: XY, goal: XY) extends PathSolver {
-  /**val move set */
-  val moves = Move.values - Move.Center
-
-  /**bad tile def */
-  def isBad(t: Tile.Tile) = (t == Tile.Wall || t == Tile.Toxifera || t == Tile.MiniBot)
-
-  def solve(): List[Move] = {
+  def solve(): Set[Move] = {
     val closedSet = mutable.Set[XY]()
     val openSet = mutable.Set[XY](start)
     val cameFrom = mutable.OpenHashMap[XY, XY]()
@@ -55,7 +67,15 @@ class AStarSearch(view: View, start: XY, goal: XY) extends PathSolver {
       val current = openSet.minBy(x => fScore(x))
       if (current == goal) {
         val path = reconstructPath(cameFrom, goal)
-        return List(path(1)-path(0))
+        if (path.length==2) {
+          return Set(path(1)-path(0))
+        } else {
+          // permute the options for step 2
+          val p1 = path(0)
+          val p2 = path(2)
+          val opts = (neighbours(view,p1) intersect neighbours(view,p2))
+          return opts.map(o => o - p1).toSet
+        }
       }
 
       openSet.remove(current)
@@ -75,13 +95,7 @@ class AStarSearch(view: View, start: XY, goal: XY) extends PathSolver {
     }
 
     // failure
-    List()
-  }
-
-  private def neighbours(view: View, xy: XY) = {
-    moves.map(xy + _).filter(p => {
-      p == goal || (!isBad(view.at(p)) && view.isBounded(p))
-    })
+    Set()
   }
 
   private def reconstructPath(cameFrom: Map[XY, XY], current: XY): List[XY] = {
@@ -91,4 +105,64 @@ class AStarSearch(view: View, start: XY, goal: XY) extends PathSolver {
       List(current)
     }
   }
+}
+
+/** alternative path solver that's just too slow */
+class BFS(view: View, start: XY, goal: XY) extends PathSolver {
+  val moves = Move.values - Move.Center
+
+  def solve(): Set[Move] = {
+    if (!view.isBounded(goal)) return Set()
+
+    val matrix = Array.fill(math.pow(view.cols,2).toInt)(Int.MaxValue)
+
+    var q = List((start,0))
+    while (!q.isEmpty) {
+      // dequeue
+      val elem = q.head
+      q = q.tail
+
+      val xy = elem._1
+      val step = elem._2
+
+      matrix(toInt(xy)) = step
+
+      neighbours(view,xy).foreach(n => {
+        val i = toInt(n)
+        if (matrix(i)>step) {
+          q = (n,step+1) :: q
+        }
+      })
+    }
+
+    // solvable?
+    val len = matrix(toInt(goal))
+    if (len == Int.MaxValue) {
+      Set()
+    } else {
+      // walk backwards
+      var candidates = Set(goal)
+      var i = len
+      while( i>1 ) {
+        i -= 1
+        candidates = candidates.foldLeft(Set[XY]()){ (l,c) =>
+          l ++ neighbours(view,c).filter(xy => matrix(toInt(xy))==i).toSet
+        }
+      }
+
+      candidates.map(xy => xy - start)
+    }
+  }
+
+//  def toString(matrix: Array[Int]) = {
+//    val s = new collection.mutable.StringBuilder()
+//    for (i <- 0 until matrix.length) {
+//      if (i % math.sqrt(matrix.length).toInt == 0) s.append('\n')
+//      val n = matrix(i)
+//      s.append(if (n==Int.MaxValue) "W" else if (n>=10) "+" else n.toString)
+//    }
+//    s.drop(1).toString()
+//  }
+
+  private def toInt(xy: XY) = xy.y * view.cols + xy.x
 }

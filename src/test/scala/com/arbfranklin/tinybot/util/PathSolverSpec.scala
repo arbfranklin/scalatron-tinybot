@@ -26,7 +26,7 @@
 package com.arbfranklin.tinybot.util
 
 import org.specs2.mutable._
-import org.specs2.matcher.ContainAnyOfMatcher
+import org.specs2.matcher.{ContainMatcher, ContainAnyOfMatcher}
 
 /**
  * The pathfinder should be able to find the best path for anything within the view bounds.. outside of that it gives up.
@@ -57,11 +57,6 @@ class PathSolverSpec extends Specification {
       solve(view, Move(2,0))  must beIn(Move(1,0), Move(1,-1), Move(1,1))
     }
 
-    "be solved on extent" in {
-      solve(view, Move(-4,-4))  must beIn(Move(-1,-1))
-      solve(view, Move(4,4))    must beIn(Move(1,1))
-    }
-
     "be unsolved past extents" in {
       solve(view, Move(-20,-20))  must beEmpty
       solve(view, Move(20,20))    must beEmpty
@@ -82,9 +77,9 @@ class PathSolverSpec extends Specification {
     """)
 
     "not be solvable" in {
-      solve(view, Move(5,0)) must beEmpty
-      solve(view, Move(5,-5)) must beEmpty // we can allow us to get closer
-      solve(view, Move(5,5)) must beEmpty
+      solve(view, Move(4,0)) must beEmpty
+      solve(view, Move(4,-4)) must beEmpty // we can allow us to get closer
+      solve(view, Move(4,4)) must beEmpty
     }
   }
 
@@ -102,9 +97,9 @@ class PathSolverSpec extends Specification {
         _________
       """)
 
-      solve(view, Move(5,0)) must beIn(Move(0,-1), Move(1,-1))
-      solve(view, Move(5,-5)) must beIn(Move(0,-1), Move(1,-1))
-      solve(view, Move(5,5)) must beIn(Move(-1,0), Move(-1,1))
+      solve(view, Move(4,0)) must beIn(Move(0,-1), Move(-1,-1))
+      solve(view, Move(4,-4)) must beIn(Move(0,-1), Move(-1,-1))
+      solve(view, Move(4,4)) must beIn(Move(-1,0), Move(-1,1))
     }
 
     "be solved with no occlusion" in {
@@ -120,19 +115,18 @@ class PathSolverSpec extends Specification {
         _________
       """)
 
-      solve(view, Move(5,0)) must beEmpty
-      solve(view, Move(5,-5)) must beIn(Move(0,-1), Move(1,-1))
-      solve(view, Move(5,5)) must beIn(Move(-1,0), Move(-1,1))
+      solve(view, Move(4,0)) must beEmpty
+      solve(view, Move(4,-4)) must beIn(Move(0,-1), Move(-1,-1))
+      solve(view, Move(4,4)) must beIn(Move(-1,0), Move(-1,1))
     }
 
   }
 
   /** helpers */
-  def solve(view: View, move: Move) = new AStarSearch(view, view.center, view.center + move).solve()
+  def solve(view: View, move: Move) = PathSolver(view, view.center, view.center + move).solve()
   def toView(s: String) = View(s.replaceAll("\\s*",""))
 
   def beIn(vals: Move*) = {
-    val disallowed = vals.foldLeft(Move.values){(r,m) => r - m}
-    not(new ContainAnyOfMatcher(disallowed))
+    new ContainMatcher(vals.seq).only
   }
 }

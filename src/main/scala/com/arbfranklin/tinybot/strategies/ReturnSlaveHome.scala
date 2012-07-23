@@ -67,7 +67,7 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
       if (moves.isEmpty) {
         Vote.Abstain
       } else {
-        val score = if (eol) Score.Mandate else Score.High
+        val score = if (eol) Score(0.999999) else Score.High
         moves.map(m => Vote(m, score, name))
       }
     } else {
@@ -78,7 +78,7 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
   def solve(view: View, goal: XY) = {
     val ngoal = TargetBounder.bound(view,goal)
     ngoal match {
-      case Some(g) => new AStarSearch(view, view.center, g).solve()
+      case Some(g) => PathSolver(view, view.center, g).solve()
       case None => List()
     }
   }
