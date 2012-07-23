@@ -80,7 +80,7 @@ class AStarSearch(view: View, start: XY, goal: XY) extends PathSolver {
 
   private def neighbours(view: View, xy: XY) = {
     moves.map(xy + _).filter(p => {
-      p == goal || (view.isBounded(p) && !isBad(view.at(p)))
+      p == goal || (!isBad(view.at(p)) && view.isBounded(p))
     })
   }
 

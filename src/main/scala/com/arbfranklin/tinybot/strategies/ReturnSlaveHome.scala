@@ -76,6 +76,10 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
   }
 
   def solve(view: View, goal: XY) = {
-    new AStarSearch(view, view.center, view.bounded(goal)).solve()
+    val ngoal = TargetBounder.bound(view,goal)
+    ngoal match {
+      case Some(g) => new AStarSearch(view, view.center, g).solve()
+      case None => List()
+    }
   }
 }
