@@ -122,6 +122,9 @@ class TinyBot(val g: Genome) extends BotResponder {
     val move = fm.action.asInstanceOf[Move]
     val reason = fm.reason
 
+    // the move instructions
+    val moveInstructions = List(move, SetState("lastMove", move.toString))
+
     // spawn?
     val spawns = actions.filter(_.action.isInstanceOf[Spawn])
     if (!spawns.isEmpty && fm.score.v >= 0) {
@@ -129,15 +132,20 @@ class TinyBot(val g: Genome) extends BotResponder {
       val biggest = spawns.maxBy(_.action.asInstanceOf[Spawn].energy)
 
       var spawn = biggest.action.asInstanceOf[Spawn]
-      if (spawn.direction == Move.Center) {
-        spawn = Spawn(move, spawn.energy)
+      if (spawn.direction != Move.Center) {
+        return List(spawn, Status(biggest.reason)) ::: moveInstructions ::: states
+      } else {
+        // where to spawn?
+        val moves = Move.values.filter(m => ctx.view.at(ctx.view.toXY(m))==Tile.Empty) - move - Move.Center
+        if (!moves.isEmpty) {
+          return List(Spawn(randFrom(moves), spawn.energy), Status(biggest.reason)) ::: moveInstructions ::: states
+        }
       }
-
-      return List(spawn, Status(biggest.reason)) ::: states
+      // unable to complete the spawn
     }
 
     // if we're here, it's just a regular move
-    List(move, Status(reason), SetState("lastMove", move.toString)) ::: states
+    List(Status(reason)) ::: moveInstructions ::: states
   }
 
   /**collate all the potential actions */
@@ -179,5 +187,10 @@ class TinyBot(val g: Genome) extends BotResponder {
       // TODO: the max score is the move, but not necessarily the reason
       cscores.maxBy(v => v.score.v)
     }
+  }
+
+  def randFrom[T](list: List[T]): T = {
+    val rand = scala.util.Random
+    list(rand.nextInt(list.length))
   }
 }

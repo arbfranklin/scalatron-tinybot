@@ -67,7 +67,7 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
       if (moves.isEmpty) {
         Vote.Abstain
       } else {
-        val score = if (eol) Score(0.9999) else Score.High
+        val score = if (eol) Score.Mandate else Score.High
         moves.map(m => Vote(m, score, name))
       }
     } else {
