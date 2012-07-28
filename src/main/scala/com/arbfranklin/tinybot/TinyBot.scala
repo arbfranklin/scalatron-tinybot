@@ -54,7 +54,7 @@ class TinyBot(val g: Genome) extends BotResponder {
     new CreateDistance(Bot) -> g.slave.spreadOut.weight,
     new RandomMove() -> g.slave.random.weight,
     new VelocityMove() -> g.slave.velocity.weight,
-    new ReturnSlaveHome(g.slave.home.roi, g.slave.home.safetyMargin) -> g.slave.home.weight,
+    new ReturnSlaveHome(g.slave.home.roi, g.slave.home.safetyMargin, g.shared.spawn.maxBots) -> g.slave.home.weight,
     new StuckKamakazi() -> 1d,
     new ExplodeOnApocalypse(g.slave.apocalypse.minTurns) -> 1d,
     new SlaveSpawn(g.slave.spawn.frequency, g.slave.spawn.imbalance, g.shared.spawn.maxBots) -> 1d,

@@ -37,9 +37,12 @@ import com.arbfranklin.tinybot.util._
  *
  * Once condition #2 is met for any bot, all mini-bots instantly go into state #2 in-order to not block the path home.
  */
-class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
+class ReturnSlaveHome(roi: Double, turnHomeMargin: Double, maxBots: Int) extends Strategy {
   /** should all bots return home now */
   var globalRecall = false
+
+  /** don't worry about roi until we're this percentage of the requested bot allocation */
+  val MaxBotsRoiThreshold = 0.9
 
   override def name = "*home*"
 
@@ -48,7 +51,7 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
     val slave = ctx.asInstanceOf[SlaveContext]
 
     /** roi obtained? */
-    val roiReached = slave.energy > (slave.startEnergy * roi)
+    val roiReached = slave.energy > (slave.startEnergy * roi) && ctx.botCount > (maxBots*MaxBotsRoiThreshold)
 
     // nearing the end, we want to race home regardless of ROI
     def eol: Boolean = {

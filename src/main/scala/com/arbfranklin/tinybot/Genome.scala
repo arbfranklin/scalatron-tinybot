@@ -36,7 +36,7 @@ class Genome private(props: mutable.Map[String, Double]) {
   val master = new Bundle {
     // unfortunately the winning strategy is very much to spawn as much as you can
     val spawn = new Bundle {
-      val maxBots = (get("master/spawn:maxBots", 0.1) * 500).toInt
+      val maxBots = (get("master/spawn:maxBots", 0.25) * 500).toInt
     }
 
     val avoidEnergyLoss = new Bundle {
