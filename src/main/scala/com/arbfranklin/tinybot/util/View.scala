@@ -29,16 +29,17 @@ import Tile._
 import scala.Array
 import collection.mutable.ListBuffer
 
-class View(val cols: Int, cells: Array[Tile]) {
+class View(val cols: Int, val cells: Array[Tile]) {
   /** center of the view (me) */
   val center = XY(cols / 2, cols / 2)
+  private val middle = cells.length/2
 
   /** a move to an absolute co-ordinate */
   def toXY(move: Move): XY = center + move
 
   /** the tile at the given abs co-ordinate */
   def at(pos: XY): Tile = {
-    val c = toInt(pos)
+    val c = toInt(pos.x, pos.y)
     if (c < 0 || c >= cells.length) Occluded else cells(c)
   }
 
@@ -50,7 +51,7 @@ class View(val cols: Int, cells: Array[Tile]) {
     val result = new ListBuffer[XY]()
     var i = 0
     while (i < cells.length) {
-      if (cells(i) == t) {
+      if (cells(i) == t && i!=middle) {
         result += toXY(i)
       }
       i += 1
@@ -63,7 +64,7 @@ class View(val cols: Int, cells: Array[Tile]) {
     val result = new ListBuffer[XY]()
     var i = 0
     while (i < cells.length) {
-      if (tiles.contains(cells(i))) {
+      if (tiles.contains(cells(i)) && i!=middle) {
         result += toXY(i)
       }
       i += 1
@@ -72,7 +73,7 @@ class View(val cols: Int, cells: Array[Tile]) {
   }
 
   /** is the point bounded in the view */
-  def isBounded(pos: XY): Boolean = {
+  def contains(pos: XY): Boolean = {
     pos.x >= 0 && pos.x < cols && pos.y >= 0 && pos.y < cols
   }
 
@@ -84,9 +85,9 @@ class View(val cols: Int, cells: Array[Tile]) {
     XY(bx,by)
   }
 
-  private def toInt(xy: XY) = xy.y * cols + xy.x
+  protected def toInt(x: Int, y: Int) = y * cols + x
 
-  private def toXY(n: Int) = {
+  protected def toXY(n: Int) = {
     val x = n % cols
     val y = n / cols
     XY(x, y)
@@ -105,12 +106,11 @@ class View(val cols: Int, cells: Array[Tile]) {
 object View {
   def apply(s: String): View = {
     val cols = math.sqrt(s.size).toInt
+    val tiles = new Array[Tile](s.length)
+    for (i <- 0 until s.length) {
+      tiles(i) = Tile(s(i))
+    }
 
-    val result = s.map(c => Tile(c)).toArray
-
-    // the center gets a special tile
-    result(result.length / 2) = Me
-
-    new View(cols, result)
+    new View(cols, tiles)
   }
 }

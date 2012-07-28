@@ -97,9 +97,9 @@ class Genome private(props: mutable.Map[String, Double]) {
     }
 
     val home = new Bundle {
-      val weight = get("slave/home:weight", 0.9809)
-      val roi = (get("slave/home:roi", 0.2319) * 100).toInt
-      val safetyMargin = get("slave/home:safetyMargin", 0.34) * 10
+      val weight = get("slave/home:weight", 0.8)
+      val roi = (get("slave/home:roi", 0.03) * 100).toInt
+      val safetyMargin = get("slave/home:safetyMargin", 0.3) * 10
     }
 
     val random = new Bundle {
@@ -127,7 +127,7 @@ class Genome private(props: mutable.Map[String, Double]) {
 
   val shared = new Bundle {
     val spawn = new Bundle {
-      val maxBots = (get("shared/spawn:maxBots", 0.51) * 1000).toInt
+      val maxBots = (get("shared/spawn:maxBots", 0.7) * 1000).toInt
     }
   }
 

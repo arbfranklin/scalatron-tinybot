@@ -26,7 +26,7 @@
 package com.arbfranklin.tinybot.util
 
 /** a bots reaction context */
-abstract class ReactContext(val view: View, params: Map[String, String]) {
+abstract class ReactContext(val view: View, val mapOfWorld: MapOfWorld, params: Map[String, String]) {
   def name = params("name")
 
   def energy = params("energy").toInt
@@ -51,26 +51,24 @@ abstract class ReactContext(val view: View, params: Map[String, String]) {
   def distTo(xy: XY) = view.center.distTo(xy)
 }
 
-case class MasterContext(override val view: View, params: Map[String, String]) extends ReactContext(view, params) {
+case class MasterContext(override val view: View, override val mapOfWorld: MapOfWorld, params: Map[String, String])
+  extends ReactContext(view, mapOfWorld, params)
+{
 
 }
 
-case class SlaveContext(override val view: View, params: Map[String, String]) extends ReactContext(view, params) {
+case class SlaveContext(override val view: View, override val mapOfWorld: MapOfWorld, params: Map[String, String])
+  extends ReactContext(view, mapOfWorld, params)
+{
   /** starting energy of this slave */
   def startEnergy = params("startEnergy").toInt
 
   /** the direction to the master */
-  def masterDirection: Move = toMaster match {
-    case Some(m) => m.step
-    case None => Move.Center
-  }
+  def masterDirection: Move = masterMove.step
 
   /** the position of the master relative to our frame of view */
-  def master: XY = toMaster match {
-    case Some(m) => view.center + m
-    case None => view.center
-  }
+  def master: XY = view.center + masterMove
 
   /** how to get to the master */
-  private def toMaster: Option[Move] = if (params.contains("master")) Some(Move(params("master"))) else None
+  def masterMove = Move(params("master"))
 }

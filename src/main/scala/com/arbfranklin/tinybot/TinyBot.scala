@@ -80,7 +80,6 @@ class TinyBot(val g: Genome) extends BotResponder {
     if (Debug.enabled) {
       print("\r[" + ctx.time + "/" + ctx.apocalypse + "] -> " + ctx.energy + "\r")
     }
-
     eval(ctx, masterStrategies)
   }
 

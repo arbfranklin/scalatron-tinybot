@@ -63,7 +63,7 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
     }
 
     if (roiReached || eol) {
-      val moves = solve(ctx.view, slave.master)
+      val moves = solve(slave)
       if (moves.isEmpty) {
         Vote.Abstain
       } else {
@@ -75,11 +75,18 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double) extends Strategy {
     }
   }
 
-  def solve(view: View, goal: XY) = {
-    val ngoal = TargetBounder.bound(view,goal)
-    ngoal match {
-      case Some(g) => PathSolver(view, view.center, g).solve()
-      case None => List()
+  def solve(ctx: SlaveContext) = {
+    if (ctx.view.contains(ctx.master)) {
+      PathSolver(ctx.view, ctx.view.center, ctx.master).solve()
+    } else {
+      val center = ctx.mapOfWorld.center
+      val me = XY(center.x - ctx.masterMove.right, center.y - ctx.masterMove.down)
+      if (ctx.mapOfWorld.contains(me)) {
+        PathSolver(ctx.mapOfWorld, me, center).solve()
+      } else {
+        // try a direct path solution or out of bounds
+        new DirectPathSolver(ctx.view, ctx.view.center, ctx.master).solve()
+      }
     }
   }
 }

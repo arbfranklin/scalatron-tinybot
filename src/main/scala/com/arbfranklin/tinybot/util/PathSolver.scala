@@ -26,7 +26,6 @@
 package com.arbfranklin.tinybot.util
 
 import collection._
-import PathSolver._
 
 trait PathSolver {
   def solve(): Set[Move]
@@ -34,19 +33,6 @@ trait PathSolver {
 
 object PathSolver {
   def apply(view: View, start: XY, goal: XY): PathSolver = new AStarSearch(view, start, goal)
-
-  /**val move set */
-  val moves = Move.values - Move.Center
-
-  /**bad tile def */
-  def isBad(t: Tile.Tile) = (t == Tile.Wall || t == Tile.Toxifera || t == Tile.MiniBot)
-
-  /** find the neighbouring squares of xy */
-  def neighbours(view: View, xy: XY) = {
-    moves.map(xy + _).filter(p => {
-      !isBad(view.at(p)) && view.isBounded(p)
-    })
-  }
 }
 
 /**
@@ -98,6 +84,19 @@ class AStarSearch(view: View, start: XY, goal: XY) extends PathSolver {
     Set()
   }
 
+  /**val move set */
+  val moves = Move.values - Move.Center
+
+  /**bad tile def */
+  def isBad(t: Tile.Tile) = (t == Tile.Wall || t == Tile.Toxifera)
+
+  /** find the neighbouring squares of xy */
+  def neighbours(view: View, xy: XY) = {
+    moves.map(xy + _).filter(p => {
+      !isBad(view.at(p)) && view.contains(p)
+    })
+  }
+
   private def reconstructPath(cameFrom: Map[XY, XY], current: XY): List[XY] = {
     if (cameFrom.contains(current)) {
       reconstructPath(cameFrom, cameFrom(current)) ++ List(current)
@@ -105,4 +104,23 @@ class AStarSearch(view: View, start: XY, goal: XY) extends PathSolver {
       List(current)
     }
   }
+}
+
+/** Can a direct path be formed by travelling from start to goal within the limited view scope? */
+class DirectPathSolver(view: View, start: XY, goal: XY) extends PathSolver {
+  def solve() : Set[Move] = {
+    val bdg = view.bounded(goal)
+    var current = start
+    while (current!=bdg) {
+      if (isBad(view.at(current))) {
+        return Set()
+      }
+      current = current + (bdg - current).step
+    }
+    // we reached the goal
+    Set((bdg - start).step)
+  }
+
+  /**bad tile def */
+  def isBad(t: Tile.Tile) = (t == Tile.Wall || t == Tile.Toxifera)
 }

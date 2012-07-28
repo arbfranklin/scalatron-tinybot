@@ -27,5 +27,9 @@ package com.arbfranklin.tinybot.util
 
 /**is debugging mode enabled? */
 object Debug {
-  val enabled = System.getProperty("debug", "false").toBoolean
+  val enabled = try {
+    System.getProperty("debug", "false").toBoolean
+  } catch {
+    case e: SecurityException => false
+  }
 }

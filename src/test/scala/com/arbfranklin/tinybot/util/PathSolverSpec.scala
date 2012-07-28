@@ -34,14 +34,14 @@ import org.specs2.matcher.{ContainMatcher, ContainAnyOfMatcher}
 class PathSolverSpec extends Specification {
   "a simple unblocked path" should {
     val view = toView("""
-      _______
-      _______
-      _______
-      ___M___
-      _______
-      _______
-      _______
-    """)
+      |_______
+      |_______
+      |_______
+      |___M___
+      |_______
+      |_______
+      |_______
+    """.stripMargin)
 
     "be solved along diagonals" in {
       solve(view, Move(-2,-2))  must beIn(Move(-1,-1))
@@ -65,16 +65,16 @@ class PathSolverSpec extends Specification {
 
   "a fully blocked path" should {
     val view = toView("""
-      _______W?
-      _______W?
-      _______W?
-      _______W?
-      ____M__W?
-      _______W?
-      _______W?
-      _______W?
-      _______W?
-    """)
+      |_______W?
+      |_______W?
+      |_______W?
+      |_______W?
+      |____M__W?
+      |_______W?
+      |_______W?
+      |_______W?
+      |_______W?
+    """.stripMargin)
 
     "not be solvable" in {
       solve(view, Move(4,0)) must beEmpty
@@ -86,16 +86,16 @@ class PathSolverSpec extends Specification {
   "a partially blocked path" should {
     "be solved with occlusion" in {
       val view = toView("""
-        _________
-        _________
-        ____WWWW?
-        _______W?
-        ____M__W?
-        _______W?
-        __WWWWWW?
-        _________
-        _________
-      """)
+        |_________
+        |_________
+        |____WWWW?
+        |_______W?
+        |____M__W?
+        |_______W?
+        |__WWWWWW?
+        |_________
+        |_________
+      """.stripMargin)
 
       solve(view, Move(4,0)) must beIn(Move(0,-1), Move(-1,-1))
       solve(view, Move(4,-4)) must beIn(Move(0,-1), Move(-1,-1))
@@ -104,16 +104,16 @@ class PathSolverSpec extends Specification {
 
     "be solved with no occlusion" in {
       val view = toView("""
-        _________
-        _________
-        ____WWWWW
-        ________W
-        ____M___W
-        ________W
-        __WWWWWWW
-        _________
-        _________
-      """)
+        |_________
+        |_________
+        |____WWWWW
+        |________W
+        |____M___W
+        |________W
+        |__WWWWWWW
+        |_________
+        |_________
+      """.stripMargin)
 
       solve(view, Move(4,0)) must beEmpty
       solve(view, Move(4,-4)) must beIn(Move(0,-1), Move(-1,-1))

@@ -25,6 +25,8 @@
 
 package com.arbfranklin.tinybot.util
 
+import java.util.concurrent.atomic.AtomicInteger
+
 /**
  * Heavily borrows from example bootstrap at:
  *   https://github.com/scalatron/scalatron/blob/master/Scalatron/samples/Tutorial%20Bot%2011%20-%20Handler%20Methods/src/Bot.scala
@@ -33,8 +35,10 @@ class ControlFunction(r: BotResponder) {
   var globals = Map[String, String]()
 
   /** counters for figuring out the overall bot count */
-  var botCountInterval = 0
-  var botCount = 0
+  val botCount = new AtomicInteger()
+
+  /** the world map we're building */
+  var worldMap = MapOfWorld()
 
   def respond(input: String): String = {
     try {
@@ -73,20 +77,31 @@ class ControlFunction(r: BotResponder) {
   }
 
   def react(generation: Int, view: View, params: Map[String, String]): List[Action] = {
-    // how many times has react been called for this generation
     val time = params("time").toInt
-    if (time > botCountInterval) {
-      globals += ("botCount" -> botCount.toString)
-      botCount = 0
-      botCountInterval = time
+
+    // how many times has react been called for this generation?
+    if (generation==0) {
+      globals += ("botCount" -> (botCount.intValue()/2).toString)
+      botCount.set(0)
     }
-    botCount += 1
+    botCount.incrementAndGet()
 
     // sub-delegation
     if (generation == 0) {
-      r.reactAsMaster(MasterContext(view, globals ++ params))
+      // update the world map picture
+//      worldMap = worldMap.combine(XY(0,0), view)
+
+      r.reactAsMaster(MasterContext(view, worldMap, globals ++ params))
     } else {
-      r.reactAsSlave(SlaveContext(view, globals ++ params))
+      // update the world map picture
+      val master = Move(params("master"))
+
+      val apocalypse = globals("apocalypse").toInt
+      val newMap = if (apocalypse - time < 350) worldMap.combine(XY(-master.right, -master.down), view) else worldMap
+//      val newMap = worldMap.combine(XY(-master.right, -master.down), view)
+      worldMap = newMap
+
+      r.reactAsSlave(SlaveContext(view, newMap, globals ++ params))
     }
   }
 }

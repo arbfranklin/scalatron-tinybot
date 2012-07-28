@@ -26,7 +26,7 @@
 package com.arbfranklin.tinybot
 
 import java.io.File
-import util.{MasterContext, SlaveContext, BotResponder}
+import util.{SlaveContext, MasterContext, BotResponder}
 
 /**A genetic algorithm approach to bot tweaking */
 class TinyBotGA(var seeds: List[Genome], gsize: Int) extends BotResponder {
@@ -114,7 +114,11 @@ object TinyBotGA {
   /** how many runs per genome */
   val testPerGenome = 3
 
-  val writeARFF = System.getProperty("writeARFF", "false").toBoolean
+  val writeARFF = try {
+    System.getProperty("writeARFF", "false").toBoolean
+  } catch {
+    case e: SecurityException => false
+  }
 
   def apply(s: Genome, gsize: Int, mutationCount: Int): TinyBotGA = {
     val seeds = seed(Map(s -> 0), gsize, mutationCount)
