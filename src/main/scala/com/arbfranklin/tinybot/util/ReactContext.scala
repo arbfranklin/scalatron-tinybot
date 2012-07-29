@@ -27,25 +27,25 @@ package com.arbfranklin.tinybot.util
 
 /** a bots reaction context */
 abstract class ReactContext(val view: View, val mapOfWorld: MapOfWorld, params: Map[String, String]) {
-  def name = params("name")
+  val name = params("name")
 
-  def energy = params("energy").toInt
+  val energy = params("energy").toInt
+
+  val time = params("time").toInt
+
+  val apocalypse = params("apocalypse").toInt
 
   /** estimate of the total number of bots */
-  def botCount = if (params.contains("botCount")) params("botCount").toInt else 0
+  val botCount = if (params.contains("botCount")) params("botCount").toInt else 0
 
   /** last move */
   def lastMove: Move = if (params.contains("lastMove")) Move(params("lastMove")) else Move.Center
 
+  /** how many turns till the apocalypse */
+  def tillApocalypse = apocalypse - time
+
   /** did the previous move result in a collision? */
   def isCollision: Option[Move] = if (params.contains("collision")) Some(Move(params("collision"))) else None
-
-  /** iteration number */
-  def time = params("time").toInt
-
-  def apocalypse = params("apocalypse").toInt
-
-  def tillApocalypse = apocalypse - time
 
   /**distance wrapper, assume we're the center of the view */
   def distTo(xy: XY) = view.center.distTo(xy)
@@ -53,18 +53,12 @@ abstract class ReactContext(val view: View, val mapOfWorld: MapOfWorld, params: 
 
 case class MasterContext(override val view: View, override val mapOfWorld: MapOfWorld, params: Map[String, String])
   extends ReactContext(view, mapOfWorld, params)
-{
-
-}
 
 case class SlaveContext(override val view: View, override val mapOfWorld: MapOfWorld, params: Map[String, String])
   extends ReactContext(view, mapOfWorld, params)
 {
   /** starting energy of this slave */
   def startEnergy = params("startEnergy").toInt
-
-  /** the direction to the master */
-  def masterDirection: Move = masterMove.step
 
   /** the position of the master relative to our frame of view */
   def master: XY = view.center + masterMove

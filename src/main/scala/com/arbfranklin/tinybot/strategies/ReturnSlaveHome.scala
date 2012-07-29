@@ -53,29 +53,29 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double, maxBots: Int) extends
     /** roi obtained? */
     val roiReached = slave.energy > (slave.startEnergy * roi) && ctx.botCount > (maxBots*MaxBotsRoiThreshold)
 
-    // nearing the end, we want to race home regardless of ROI
-    def eol: Boolean = {
-      if (!globalRecall) {
-        val turnsRemaining = ctx.apocalypse - ctx.time
-        val distHome = ctx.distTo(slave.master)
-
-        // when we are almost out of time, we need this many turns times the dist count to make it back
-        globalRecall = turnsRemaining < (distHome * turnHomeMargin)
-      }
-      globalRecall
-    }
-
-    if (roiReached || eol) {
+    if (roiReached || eol(slave)) {
       val moves = solve(slave)
       if (moves.isEmpty) {
         Vote.Abstain
       } else {
-        val score = if (eol) Score(0.999999) else Score.High
+        val score = if (globalRecall) Score(0.999999) else Score.High
         moves.map(m => Vote(m, score, name))
       }
     } else {
       Vote.Abstain
     }
+  }
+
+  // nearing the end, we want to race home regardless of ROI
+  def eol(ctx: SlaveContext): Boolean = {
+    if (!globalRecall) {
+      val turnsRemaining = ctx.apocalypse - ctx.time
+      val distHome = ctx.distTo(ctx.master)
+
+      // when we are almost out of time, we need this many turns times the dist count to make it back
+      globalRecall = turnsRemaining < (distHome * turnHomeMargin)
+    }
+    globalRecall
   }
 
   def solve(ctx: SlaveContext) = {

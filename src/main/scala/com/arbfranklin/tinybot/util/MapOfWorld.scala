@@ -29,7 +29,10 @@ import com.arbfranklin.tinybot.util.Tile._
 
 /** A view representing the entire world */
 class MapOfWorld private(override val cols: Int, override val cells: Array[Tile]) extends View(cols, cells) {
-  /** combine the given view into this view, either mutating this one or returning a new instance */
+  /**
+   * combine the given view into this view, either mutating this one or returning a new instance.
+   * @param offset The where the center of 'other' lives relative to the center of 'this'
+   */
   def combine(offset: XY, other: View): MapOfWorld = {
     val ncols = 2*(math.abs(offset.x) max math.abs(offset.y)) + other.cols
     val result = expand(ncols max cols)

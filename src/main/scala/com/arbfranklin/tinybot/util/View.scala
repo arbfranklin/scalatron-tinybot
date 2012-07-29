@@ -44,7 +44,7 @@ class View(val cols: Int, val cells: Array[Tile]) {
   }
 
   /** non-empty items around the given position */
-  def around(pos: XY): List[Tile] = Move.values.map(m => at(pos + m)).filter(_ != Empty)
+  def around(pos: XY): List[Tile] = Move.values.map(m => at(pos + m))
 
   /** find all instances of the given type. Imperative for performance. */
   def find(t: Tile): Seq[XY] = {
@@ -77,7 +77,7 @@ class View(val cols: Int, val cells: Array[Tile]) {
     pos.x >= 0 && pos.x < cols && pos.y >= 0 && pos.y < cols
   }
 
-  /** @return a point that is potentially outside the view bounded to the view extents */
+  /** @return a point that is potentially outside the view, bounded to the view extents */
   def bounded(xy: XY): XY = {
     // go to the tile on the edge
     val bx = if (xy.x < 0) 0 else if (xy.x >= cols) cols - 1 else xy.x
@@ -110,7 +110,6 @@ object View {
     for (i <- 0 until s.length) {
       tiles(i) = Tile(s(i))
     }
-
     new View(cols, tiles)
   }
 }

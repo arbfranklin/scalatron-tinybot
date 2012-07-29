@@ -88,22 +88,23 @@ class ControlFunction(r: BotResponder) {
 
     // sub-delegation
     if (generation == 0) {
-      // update the world map picture
-//      worldMap = worldMap.combine(XY(0,0), view)
-
       r.reactAsMaster(MasterContext(view, worldMap, globals ++ params))
     } else {
-      // update the world map picture
-      val master = Move(params("master"))
+      // time to update the world map?
+      val map = if (isUpdateMap(time)) {
+        val master = Move(params("master"))
+        worldMap.combine(XY(-master.right, -master.down), view)
+      } else {
+        worldMap
+      }
+      worldMap = map
 
-      val apocalypse = globals("apocalypse").toInt
-      val newMap = if (apocalypse - time < 350) worldMap.combine(XY(-master.right, -master.down), view) else worldMap
-//      val newMap = worldMap.combine(XY(-master.right, -master.down), view)
-      worldMap = newMap
-
-      r.reactAsSlave(SlaveContext(view, newMap, globals ++ params))
+      r.reactAsSlave(SlaveContext(view, map, globals ++ params))
     }
   }
+
+  /** As the world map isn't cheap to update, only do it near the game end when path finding is very important */
+  def isUpdateMap(time: Int) = globals("apocalypse").toInt - time < 350
 }
 
 /**Utility methods for parsing strings containing a single command of the format

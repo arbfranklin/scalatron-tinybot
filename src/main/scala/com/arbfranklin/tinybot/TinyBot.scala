@@ -78,7 +78,11 @@ class TinyBot(val g: Genome) extends BotResponder {
   /**called when it's the master's turn to react */
   override def reactAsMaster(ctx: MasterContext): List[Action] = {
     if (Debug.enabled) {
-      print("\r[" + ctx.time + "/" + ctx.apocalypse + "] -> " + ctx.energy + "\r")
+      if (ctx.time % 500 == 0 && ctx.time!=0) {
+        println("[%4d] score=%d".format(ctx.time, ctx.energy))
+      }
+
+      print("\r[%4d] score=%d\r".format(ctx.time, ctx.energy))
     }
     eval(ctx, masterStrategies)
   }
@@ -135,7 +139,7 @@ class TinyBot(val g: Genome) extends BotResponder {
         return List(spawn, Status(biggest.reason)) ::: moveInstructions ::: states
       } else {
         // where to spawn?
-        val moves = Move.values.filter(m => ctx.view.at(ctx.view.toXY(m))==Tile.Empty) - move - Move.Center
+        val moves = Move.values.filter(m => ctx.view.at(ctx.view.toXY(m))==Tile.Empty) - move
         if (!moves.isEmpty) {
           return List(Spawn(randFrom(moves), spawn.energy), Status(biggest.reason)) ::: moveInstructions ::: states
         }
@@ -144,7 +148,7 @@ class TinyBot(val g: Genome) extends BotResponder {
     }
 
     // if we're here, it's just a regular move
-    List(Status(reason)) ::: moveInstructions ::: states
+    Status(reason) :: moveInstructions ::: states
   }
 
   /**collate all the potential actions */
