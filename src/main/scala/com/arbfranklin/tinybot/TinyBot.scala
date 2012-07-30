@@ -78,9 +78,9 @@ class TinyBot(val g: Genome) extends BotResponder {
   /**called when it's the master's turn to react */
   override def reactAsMaster(ctx: MasterContext): List[Action] = {
     if (Debug.enabled) {
-      if (ctx.time % 500 == 0 && ctx.time!=0) {
-        println("[%4d] score=%d".format(ctx.time, ctx.energy))
-      }
+//      if (ctx.time % 500 == 0 && ctx.time!=0) {
+//        println("[%4d] score=%d".format(ctx.time, ctx.energy))
+//      }
 
       print("\r[%4d] score=%d\r".format(ctx.time, ctx.energy))
     }

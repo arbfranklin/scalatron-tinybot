@@ -55,6 +55,6 @@ class CreateDistance(tile: Tile) extends Strategy {
 
     if (c == 0) Score.Abstain
     else if (c > 0) Score.High
-    else Score(-0.1)
+    else Score(-Score.Low.v)
   }
 }

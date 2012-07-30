@@ -34,11 +34,14 @@ import com.arbfranklin.tinybot.util._
 class StuckKamakazi extends AvoidEnergyLoss {
   override def name = "kamakazi"
 
-  override def eval(ctx: ReactContext, moves: Set[Move]) = {
-    val votes: Iterable[Vote] = super.eval(ctx, moves)
+  /** don't consider a kamakazi unless we're carrying less energy than this */
+  val MaxEnergy = 1000
 
-    // TODO: if we're carrying a lot of energy, maybe we can afford to get bitten..
-    if (votes.filter(_.score.v >= 0).isEmpty) {
+  override def eval(ctx: ReactContext, moves: Set[Move]) = {
+    val votes = super.eval(ctx, moves)
+
+    // if we're carrying a lot of energy, maybe we can afford to get bitten a few times..
+    if (votes.filter(_.score.v >= 0).isEmpty && ctx.energy<=MaxEnergy) {
       Vote(Explode(2), Score.High, name)
     } else {
       Vote.Abstain
