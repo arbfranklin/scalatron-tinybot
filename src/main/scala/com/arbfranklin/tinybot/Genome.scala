@@ -51,10 +51,6 @@ class Genome private(props: mutable.Map[String, Double]) {
       val weight = get("master/huntFluppets:weight", 0.6424)
     }
 
-    val avoidOthers = new Bundle {
-      val weight = get("master/avoidOtherMiniBots:weight", 0.0816)
-    }
-
     val avoidWalls = new Bundle {
       val weight = get("master/avoidWalls:weight", 0.4)
     }
@@ -90,10 +86,6 @@ class Genome private(props: mutable.Map[String, Double]) {
 
     val huntFluppets = new Bundle {
       val weight = get("slave/huntFluppets:weight", 0.6106)
-    }
-
-    val spreadOut = new Bundle {
-      val weight = get("slave/spreadOutBots:weight", 0.2466)
     }
 
     val home = new Bundle {
