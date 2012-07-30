@@ -39,6 +39,6 @@ class RandomMove extends Strategy {
 
   /**evaluate against the given context and provide a serious of potential actions and their associated score */
   override def eval(ctx: ReactContext, moves: Set[Move]) = {
-    moves.map(m => Vote(m, Score(Score.High.v - (rand.nextDouble() * Score.Low.v)), name))
+    moves.map(m => Vote(m, Score.High - (Score.Low * rand.nextDouble()), name))
   }
 }

@@ -51,8 +51,8 @@ class AvoidEnergyLoss extends Strategy {
       val snorgCount = ctx.view.around(xy).filter(x => x == Snorg || x == OtherBot).size
       snorgCount match {
         case 0 => score
-        case 1 => Score(math.min(score.v, tileScore(Snorg).v)) // TODO: Not just snorgs
-        case _ => Score(math.min(score.v, -Score.High.v))
+        case 1 => score min tileScore(Snorg) // TODO: Not just snorgs
+        case _ => score min -Score.High
       }
     }
   }
@@ -62,8 +62,8 @@ class AvoidEnergyLoss extends Strategy {
 
   def tileScore(t: Tile): Score = t match {
     case Wall => Score.Veto
-    case Snorg => Score(Score.High.v * (-150 / maxEnergy))
-    case Toxifera => Score(Score.High.v * (-100 / maxEnergy))
+    case Snorg => Score.High * (-150 / maxEnergy)
+    case Toxifera => Score.High * (-100 / maxEnergy)
 
     case MiniBot => Score.Veto
     case OtherBot => Score.Veto

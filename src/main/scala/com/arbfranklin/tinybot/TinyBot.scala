@@ -78,9 +78,9 @@ class TinyBot(val g: Genome) extends BotResponder {
   /**called when it's the master's turn to react */
   override def reactAsMaster(ctx: MasterContext): List[Action] = {
     if (Debug.enabled) {
-//      if (ctx.time % 500 == 0 && ctx.time!=0) {
-//        println("[%4d] score=%d".format(ctx.time, ctx.energy))
-//      }
+      if (ctx.time % 500 == 0 && ctx.time!=0) {
+        println("[%4d] score=%d".format(ctx.time, ctx.energy))
+      }
 
       print("\r[%4d] score=%d\r".format(ctx.time, ctx.energy))
     }
@@ -130,7 +130,7 @@ class TinyBot(val g: Genome) extends BotResponder {
 
     // spawn?
     val spawns = actions.filter(_.action.isInstanceOf[Spawn])
-    if (!spawns.isEmpty && fm.score.v >= 0) {
+    if (!spawns.isEmpty && fm.score.isPositive) {
       // find the biggest spawn
       val biggest = spawns.maxBy(_.action.asInstanceOf[Spawn].energy)
 
@@ -163,7 +163,7 @@ class TinyBot(val g: Genome) extends BotResponder {
 
       // obtain the candidates and re-weight them
       val votes = strategy.eval(ctx, allowedMoves)
-      votes.map(v => Vote(v.action, v.score.weight(w), v.reason))
+      votes.map(v => Vote(v.action, v.score * w, v.reason))
     }).flatten
   }
 
@@ -177,7 +177,7 @@ class TinyBot(val g: Genome) extends BotResponder {
       val votes = actions.filter(_.action == move)
       val score = Score.combine(votes.map(_.score))
       val dominant = votes.maxBy(v => {
-        if (v.score == Score.Veto) Double.PositiveInfinity else v.score.v
+        if (v.score == Score.Veto) Double.PositiveInfinity else v.score.d
       }) // veto is dominant
 
       // new colaborated vote
@@ -188,7 +188,7 @@ class TinyBot(val g: Genome) extends BotResponder {
       Vote(Move.Center, Score.Abstain, "*stuck*")
     } else {
       // TODO: the max score is the move, but not necessarily the reason
-      cscores.maxBy(v => v.score.v)
+      cscores.maxBy(_.score)
     }
   }
 

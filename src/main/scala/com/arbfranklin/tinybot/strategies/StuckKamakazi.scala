@@ -41,7 +41,7 @@ class StuckKamakazi extends AvoidEnergyLoss {
     val votes = super.eval(ctx, moves)
 
     // if we're carrying a lot of energy, maybe we can afford to get bitten a few times..
-    if (votes.filter(_.score.v >= 0).isEmpty && ctx.energy<=MaxEnergy) {
+    if (votes.filter(_.score.isPositive).isEmpty && ctx.energy<=MaxEnergy) {
       Vote(Explode(2), Score.High, name)
     } else {
       Vote.Abstain

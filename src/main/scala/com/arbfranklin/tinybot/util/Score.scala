@@ -28,11 +28,21 @@ package com.arbfranklin.tinybot.util
 import collection.GenIterable
 
 /**a score for an item ranging from -1 to 1 */
-case class Score(v: Double) {
-  /**reweight a value */
-  def weight(w: Double): Score = if (fixed) this else Score(w * v)
+case class Score(d: Double) extends Ordered[Score] {
+  /** is this a positive score? */
+  def isPositive = d>=0d
 
-  def fixed = v <= (-1d) || v >= (1d)
+  /** reweight a value */
+  def *(w: Double): Score = if (d <= -1d || d >= 1d) this else Score(w * d)
+
+  def +(s: Score) = new Score(d + s.d)
+  def -(s: Score) = new Score(d - s.d)
+  def unary_- = new Score(-d)
+
+  def min(s: Score) = if (d<s.d) this else s
+  def max(s: Score) = if (d>s.d) this else s
+
+  def compare(that: Score) = d.compareTo(that.d)
 }
 
 object Score {
@@ -46,12 +56,12 @@ object Score {
   val Low = new Score(0.1)
 
   def combine(scores: GenIterable[Score]): Score = {
-    if (scores.isEmpty || !scores.filter(_.v <= (-1)).isEmpty) return Veto
-    if (!scores.filter(_.v >= 1).isEmpty) return Mandate
+    if (scores.isEmpty || !scores.filter(_.d <= (-1)).isEmpty) return Veto
+    if (!scores.filter(_.d >= 1).isEmpty) return Mandate
 
     // average the scores
     val sum = scores.foldLeft(0d) {
-      (total, s) => total + s.v
+      (total, s) => total + s.d
     }
     Score(sum / scores.size)
   }

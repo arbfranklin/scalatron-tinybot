@@ -63,7 +63,7 @@ class Hunter(tile: Tile) extends Strategy {
     val c = cDist - pDist
 
     if (c == 0) Score.Low
-    else if (c > 0) Score(Score.High.v * (1 - (pDist.toDouble / view.cols)))
-    else Score(-Score.Low.v)
+    else if (c > 0) Score.High * (1 - (pDist.toDouble / view.cols))
+    else -Score.Low
   }
 }
