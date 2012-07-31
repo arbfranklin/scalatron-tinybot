@@ -74,8 +74,6 @@ class TinyBotGA(var seeds: List[Genome], gsize: Int) extends BotResponder {
     // store the genome
     scores = (bot.g, energy) :: scores
 
-    listeners.foreach(f => f(bot.g, energy))
-
     // seed the next generation?
     if (seeds.isEmpty) {
       // bundle
@@ -85,8 +83,15 @@ class TinyBotGA(var seeds: List[Genome], gsize: Int) extends BotResponder {
       val ascores = genomes.foldLeft(Map[Genome, Int]()) {
         (r, g) =>
           val gscores = scores.filter(_._1 == g).map(_._2)
-          r + (g -> (gscores.sum / gscores.size))
+          r + (g -> gscores.max) // just take the best of to avoid negative runs
       }
+
+      // publish
+      ascores.foreach(t => {
+        val seed = t._1
+        val score = t._2
+        listeners.foreach(f => f(seed, score))
+      })
 
       // print stats for the round
       val dist = ascores.map(_._2).toList.sortWith(_ < _)
