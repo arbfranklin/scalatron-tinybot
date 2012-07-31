@@ -44,7 +44,7 @@ class ReturnSlaveHome(roi: Double, turnHomeMargin: Double, maxBots: Int) extends
   /** don't worry about roi until we're this percentage of the requested bot allocation */
   val MaxBotsRoiThreshold = 0.9
 
-  override def name = "*home*"
+  override def name = "\u2302"
 
   /**evaluate against the given context and provide a serious of potential actions and their associated score */
   override def eval(ctx: ReactContext, moves: Set[Move]) = {
