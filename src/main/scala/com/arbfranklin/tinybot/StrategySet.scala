@@ -103,7 +103,7 @@ class StrategySet private(val strategies: List[(Strategy,Double)]) {
   /**find the best move in the action set */
   private def findMove(actions: GenIterable[Vote]): Vote = {
     // only interested in move actions at this point
-    val moves = actions.map(_.action).filter(_.isInstanceOf[Move])
+    val moves = actions.map(_.action).filter(_.isInstanceOf[Move]).toSet
 
     // collaborate across the votes for each move square
     val cscores = moves.map(move => {
