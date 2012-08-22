@@ -27,20 +27,22 @@ package com.arbfranklin.tinybot.strategies
 
 import com.arbfranklin.tinybot.util._
 
-/** A strategy which involves blowing up a mini-bot whenever another bot gets close */
-class SlaveBomber(radius: Int) extends Strategy {
+/** A strategy used to stay outside of what is likely to be a potential blast radius */
+class AvoidBlastRadius(radius: Int) extends Strategy {
   /**a human readable name for the strategy */
-  override def name = "bomb"
+  override def name = "avoid"
 
   /**evaluate against the given context and provide a serious of potential actions and their associated score */
   override def eval(ctx: ReactContext, moves: Set[Move]) = {
-    val enemies = ctx.view.find(Set(Tile.OtherMiniBot, Tile.OtherBot))
-    val closeEnemies = enemies.filter(xy => ctx.view.center.distTo(xy) <= radius)
+    val enemies = ctx.view.find(Tile.OtherMiniBot)
 
-    if (!closeEnemies.isEmpty) {
-      Vote(Explode(radius+1), Score.High, name)
+    if (!enemies.isEmpty) {
+      val badMoves = moves.filter(m => minDist(ctx.view.center + m, enemies) <= radius)
+      badMoves.map(m => Vote(m, -Score.High, name))
     } else {
       Vote.Abstain
     }
   }
+
+  def minDist(xy: XY, targets: Seq[XY]) = targets.minBy(t => t.distTo(xy)).distTo(xy)
 }
