@@ -44,7 +44,7 @@ class Genome private(props: mutable.Map[String, Double]) {
     }
 
     val avoidBlastRadius = new Bundle {
-      val weight = get("master/avoidBlastRadius:weight", 0.5)
+      val weight = get("master/avoidBlastRadius:weight", 0.2)
       val radius = (get("master/avoidBlastRadius:radius", 0.3) * 7).toInt
     }
 
@@ -86,7 +86,7 @@ class Genome private(props: mutable.Map[String, Double]) {
     }
 
     val avoidBlastRadius = new Bundle {
-      val weight = get("slave/avoidBlastRadius:weight", 0.5)
+      val weight = get("slave/avoidBlastRadius:weight", 0.2)
       val radius = (get("slave/avoidBlastRadius:radius", 0.15) * 7).toInt
     }
 

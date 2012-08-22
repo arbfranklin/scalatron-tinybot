@@ -39,7 +39,7 @@ class MasterSpawn(maxBots: Int) extends Strategy {
   val MinimumEnergyForSpawn = 100
 
   /**a human readable name for the strategy */
-  override def name = "spawn"
+  override def name = "\u2442"
 
   /**evaluate against the given context and provide a serious of potential actions and their associated score */
   override def eval(ctx: ReactContext, moves: Set[Move]) = {
