@@ -47,6 +47,7 @@ class TinyBot(val g: Genome) extends BotResponder {
   val slaveStrategies = StrategySet()
     .add(new StuckKamakazi())
     .add(new EnemyChicken())
+    .add(new SlaveBomber(g.slave.bomb.radius))
     .add(new ExplodeOnApocalypse(g.slave.apocalypse.minTurns))
     .add(new SlaveSpawn(g.slave.spawn.frequency, g.slave.spawn.imbalance, g.shared.spawn.maxBots))
     .add(new AttackBots(g.slave.attack.radius, g.slave.attack.minCount, g.slave.attack.maxEnergy))

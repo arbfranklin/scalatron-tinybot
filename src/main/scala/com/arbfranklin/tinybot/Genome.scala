@@ -106,6 +106,10 @@ class Genome private(props: mutable.Map[String, Double]) {
       val minTurns = (get("slave/apocalypse:minTurns", 0.78) * 10).toInt
     }
 
+    val bomb = new Bundle {
+      val radius = (get("slave/bomb:radius", 0.15) * 7).toInt
+    }
+
     val antibump = new Bundle {
       val weight = get("slave/antibump:weight", 0.5)
     }
