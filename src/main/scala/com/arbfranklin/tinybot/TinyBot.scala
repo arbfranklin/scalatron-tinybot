@@ -41,9 +41,9 @@ class TinyBot(val g: Genome) extends BotResponder {
     .add(new FairHunter(Zugar) -> g.master.huntZugars.weight)
     .add(new FairHunter(Fluppet) -> g.master.huntFluppets.weight)
     .add(new CreateDistance(Wall) -> g.master.avoidWalls.weight)
-    .add(new RandomMove() -> g.master.random.weight)
+    .add(new CreateDistance(OtherMiniBot) -> g.master.stay.weight)
+    .add(new ReduceDistance(MiniBot) -> g.master.stay.weight)
     .add(new VelocityMove() -> g.master.velocity.weight)
-    .add(new StayForHomeComing(g.master.stay.minTurns) -> g.master.stay.weight)
 
   val slaveStrategies = StrategySet()
     .add(new StuckKamakazi())
@@ -56,7 +56,7 @@ class TinyBot(val g: Genome) extends BotResponder {
     .add(new AvoidBlastRadius(g.slave.avoidBlastRadius.radius) -> g.slave.avoidBlastRadius.weight)
     .add(new FairHunter(Zugar) -> g.slave.huntZugars.weight)
     .add(new FairHunter(Fluppet) -> g.slave.huntFluppets.weight)
-    .add(new RandomMove() -> g.slave.random.weight)
+    .add(new FairHunter(OtherBot) -> g.slave.masterHunter.weight)
     .add(new VelocityMove() -> g.slave.velocity.weight)
     .add(new ReturnSlaveHome(g.slave.home.roi, g.slave.home.safetyMargin, g.shared.spawn.maxBots) -> g.slave.home.weight)
 

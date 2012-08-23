@@ -69,8 +69,7 @@ class Genome private(props: mutable.Map[String, Double]) {
     }
 
     val stay = new Bundle {
-      val weight = get("master/stay:weight", 0.9)
-      val minTurns = (get("master/stay:weight", 0.1) * 100).toInt
+      val weight = get("master/stay:weight", 0.5)
     }
   }
 
@@ -86,7 +85,7 @@ class Genome private(props: mutable.Map[String, Double]) {
     }
 
     val avoidBlastRadius = new Bundle {
-      val weight = get("slave/avoidBlastRadius:weight", 0.2)
+      val weight = get("slave/avoidBlastRadius:weight", 0.02)
       val radius = (get("slave/avoidBlastRadius:radius", 0.15) * 7).toInt
     }
 
@@ -96,6 +95,10 @@ class Genome private(props: mutable.Map[String, Double]) {
 
     val huntFluppets = new Bundle {
       val weight = get("slave/huntFluppets:weight", 0.6106)
+    }
+
+    val masterHunter = new Bundle {
+      val weight = get("slave/masterHunter:weight", 0.6)
     }
 
     val home = new Bundle {

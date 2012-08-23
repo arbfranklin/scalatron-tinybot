@@ -73,5 +73,5 @@ class VelocityMove extends Strategy {
     }
   }
 
-  def isWall(view: View, m: Move) = view.at(view.toXY(m)) == Tile.Wall
+  def isWall(view: View, m: Move) = Set(Tile.Wall, Tile.MiniBot).contains(view.at(view.toXY(m)))
 }
