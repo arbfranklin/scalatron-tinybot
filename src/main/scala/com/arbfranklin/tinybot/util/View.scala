@@ -44,7 +44,7 @@ class View(val cols: Int, val cells: Array[Tile]) {
   }
 
   /** non-empty items around the given position */
-  def around(pos: XY): List[Tile] = Move.values.map(m => at(pos + m))
+  def around(pos: XY): List[Tile] = View.AroundMoves.map(m => at(pos + m))
 
   /** find all instances of the given type. Imperative for performance. */
   def find(t: Tile): Seq[XY] = {
@@ -104,6 +104,8 @@ class View(val cols: Int, val cells: Array[Tile]) {
 }
 
 object View {
+  val AroundMoves = Move.values - Move.Center
+
   def apply(s: String): View = {
     val cols = math.sqrt(s.size).toInt
     val tiles = new Array[Tile](s.length)

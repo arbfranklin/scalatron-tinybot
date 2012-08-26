@@ -34,9 +34,9 @@ import collection.mutable
 class Genome private(props: mutable.Map[String, Double]) {
   /** master bot properties */
   val master = new Bundle {
-    // unfortunately the winning strategy is very much to spawn as much as you can
     val spawn = new Bundle {
-      val maxBots = (get("master/spawn:maxBots", 0.25) * 500).toInt
+      val keepEnergy = (get("master/spawn:keepEnergy", 0.1) * 1000).toInt
+      val maxEnergy = (get("master/spawn:maxEnergy", 0.4) * 2000).toInt
     }
 
     val avoidEnergyLoss = new Bundle {
@@ -76,8 +76,8 @@ class Genome private(props: mutable.Map[String, Double]) {
   /** mini-bot properties */
   val slave = new Bundle {
     val spawn = new Bundle {
-      val frequency = get("slave/spawn:freq", 0.99)
-      val imbalance = (get("slave/spawn:imbalance", 0.1) * 10).toInt
+      val keepEnergy = (get("slave/spawn:keepEnergy", 0.1) * 1000).toInt
+      val maxEnergy = (get("slave/spawn:maxEnergy", 0.4) * 2000).toInt
     }
 
     val avoidEnergyLoss = new Bundle {

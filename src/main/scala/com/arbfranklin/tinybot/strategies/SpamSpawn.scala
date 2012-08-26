@@ -28,31 +28,25 @@ package com.arbfranklin.tinybot.strategies
 import com.arbfranklin.tinybot.util._
 import com.arbfranklin.tinybot.util.Spawn
 
-/**
- * To maxmimize our changes from the start, the first moves are all spawns.
- */
-class MasterSpawn(maxBots: Int) extends Strategy {
-  /** Last bot issued before apocalypse */
-  val StopBeforeApocalypse = 50
+/** A strategy that just spawns up to the maximum allowed as quickly and as efficiently as possible */
+class SpamSpawn(keepEnergy: Int, maxEnergy: Int, maxBots: Int) extends Strategy {
+  val MinSpawnEnergy = 100
+  val MinTurnsRemaining= 50
 
-  /** minimum energy for spawn */
-  val MinimumEnergyForSpawn = 100
-
-  /**a human readable name for the strategy */
   override def name = "\u2442"
 
   /**evaluate against the given context and provide a serious of potential actions and their associated score */
   override def eval(ctx: ReactContext, moves: Set[Move]) = {
-    if (spawn(ctx)) {
-      Vote(Spawn(Move.Center, MinimumEnergyForSpawn), Score.Mandate, name)
+    val energy = (ctx.energy - keepEnergy)
+    if (canSpawn(ctx) && energy>=MinSpawnEnergy) {
+      Vote(Spawn(Move.Center, energy min maxEnergy), Score.High, name)
     } else {
       Vote.Abstain
     }
   }
 
-  def spawn(ctx: ReactContext): Boolean = {
-    if (ctx.tillApocalypse <= StopBeforeApocalypse) return false
-    if (ctx.botCount>maxBots) return false // the slaves will do the work
-    ctx.energy>MinimumEnergyForSpawn
-  }
+  def canSpawn(ctx: ReactContext) = (ctx.botCount>=maxBots || ctx.tillApocalypse>MinTurnsRemaining) && emptySurroundings(ctx)
+
+  /** we prefer a low density spawn to encourage expansion */
+  def emptySurroundings(ctx: ReactContext) = ctx.view.around(ctx.view.center).filter(_==Tile.MiniBot).isEmpty
 }

@@ -65,11 +65,17 @@ class VelocityMove extends Strategy {
 
   /** determine the current velocity */
   def velocity(ctx: ReactContext): Move = {
-    val m = ctx.lastMove
-    if (m != Move.Center) {
-      m
-    } else {
-      directions(rand.nextInt(directions.length))
+    ctx.lastMove match {
+      case Some(m) => m
+      case None => {
+        if (ctx.isInstanceOf[SlaveContext]) {
+          // initial velocity away from master
+          val sctx = ctx.asInstanceOf[SlaveContext]
+          sctx.masterMove.step.negate
+        } else {
+          directions(rand.nextInt(directions.length))
+        }
+      }
     }
   }
 

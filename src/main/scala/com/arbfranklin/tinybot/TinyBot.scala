@@ -35,12 +35,11 @@ import util.Tile._
 class TinyBot(val g: Genome) extends BotResponder {
   /**weighted strategies to use for reducing the choice of next move */
   val masterStrategies = StrategySet()
-    .add(new MasterSpawn(g.master.spawn.maxBots))
+    .add(new SpamSpawn(g.master.spawn.keepEnergy, g.master.spawn.maxEnergy, g.shared.spawn.maxBots))
     .add(new AvoidEnergyLoss() -> g.master.avoidEnergyLoss.weight)
     .add(new AvoidBlastRadius(g.master.avoidBlastRadius.radius) -> g.master.avoidBlastRadius.weight)
     .add(new FairHunter(Zugar) -> g.master.huntZugars.weight)
     .add(new FairHunter(Fluppet) -> g.master.huntFluppets.weight)
-    .add(new CreateDistance(Wall) -> g.master.avoidWalls.weight)
     .add(new CreateDistance(OtherMiniBot) -> g.master.stay.weight)
     .add(new ReduceDistance(MiniBot) -> g.master.stay.weight)
     .add(new VelocityMove() -> g.master.velocity.weight)
@@ -50,7 +49,7 @@ class TinyBot(val g: Genome) extends BotResponder {
     .add(new EnemyChicken())
     .add(new SlaveBomber(g.slave.bomb.radius))
     .add(new ExplodeOnApocalypse(g.slave.apocalypse.minTurns))
-    .add(new SlaveSpawn(g.slave.spawn.frequency, g.slave.spawn.imbalance, g.shared.spawn.maxBots))
+    .add(new SpamSpawn(g.slave.spawn.keepEnergy, g.slave.spawn.maxEnergy, g.shared.spawn.maxBots))
     .add(new AttackBots(g.slave.attack.radius, g.slave.attack.minCount, g.slave.attack.maxEnergy))
     .add(new AvoidEnergyLoss() -> g.slave.avoidEnergyLoss.weight)
     .add(new AvoidBlastRadius(g.slave.avoidBlastRadius.radius) -> g.slave.avoidBlastRadius.weight)

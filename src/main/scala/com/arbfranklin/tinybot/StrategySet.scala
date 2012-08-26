@@ -59,7 +59,7 @@ class StrategySet private(val strategies: List[(Strategy,Double)]) {
     val reason = fm.reason
 
     // the move instructions
-    val moveInstructions = List(move, SetState("lastMove", move.toString))
+    val moveInstructions = if (move!=Move.Center) List(move, SetState("lastMove", move.toString)) else List()
 
     // spawn?
     val spawns = actions.filter(_.action.isInstanceOf[Spawn])

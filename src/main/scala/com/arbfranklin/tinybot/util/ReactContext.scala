@@ -39,7 +39,7 @@ abstract class ReactContext(val view: View, val mapOfWorld: MapOfWorld, params: 
   val botCount = if (params.contains("botCount")) params("botCount").toInt else 0
 
   /** last move */
-  def lastMove: Move = if (params.contains("lastMove")) Move(params("lastMove")) else Move.Center
+  def lastMove: Option[Move] = if (params.contains("lastMove")) Some(Move(params("lastMove"))) else None
 
   /** how many turns till the apocalypse */
   def tillApocalypse = apocalypse - time
