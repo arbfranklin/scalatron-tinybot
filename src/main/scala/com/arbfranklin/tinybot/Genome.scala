@@ -35,7 +35,7 @@ class Genome private(props: mutable.Map[String, Double]) {
   /** master bot properties */
   val master = new Bundle {
     val spawn = new Bundle {
-      val keepEnergy = (get("master/spawn:keepEnergy", 0.1) * 1000).toInt
+      val keepEnergy = (get("master/spawn:keepEnergy", 0.0) * 1000).toInt
       val maxEnergy = (get("master/spawn:maxEnergy", 0.4) * 2000).toInt
     }
 
