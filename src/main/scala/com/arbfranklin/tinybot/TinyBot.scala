@@ -57,7 +57,7 @@ class TinyBot(val g: Genome) extends BotResponder {
     .add(new FairHunter(Fluppet) -> g.slave.huntFluppets.weight)
     .add(new FairHunter(OtherBot) -> g.slave.masterHunter.weight)
     .add(new VelocityMove() -> g.slave.velocity.weight)
-    .add(new SpreadOut() -> g.slave.spread.weight) // TODO: own weighting
+    .add(new SpreadOut() -> g.slave.spread.weight)
     .add(new ReturnSlaveHome(g.slave.home.roi, g.slave.home.safetyMargin, g.shared.spawn.maxBots) -> g.slave.home.weight)
 
   var startTime = 0L
