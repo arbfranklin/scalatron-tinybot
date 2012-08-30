@@ -56,14 +56,6 @@ class Genome private(props: mutable.Map[String, Double]) {
       val weight = get("master/huntFluppets:weight", 0.6424)
     }
 
-    val avoidWalls = new Bundle {
-      val weight = get("master/avoidWalls:weight", 0.4)
-    }
-
-    val random = new Bundle {
-      val weight = get("master/randomMove:weight", 0.05)
-    }
-
     val velocity = new Bundle {
       val weight = get("master/velocity:weight", 0.17)
     }
@@ -107,8 +99,8 @@ class Genome private(props: mutable.Map[String, Double]) {
       val safetyMargin = get("slave/home:safetyMargin", 0.3) * 10
     }
 
-    val random = new Bundle {
-      val weight = get("slave/randomMove:weight", 0.041)
+    val spread = new Bundle {
+      val weight = get("slave/spread:weight", 0.02)
     }
 
     val velocity = new Bundle {
@@ -121,10 +113,6 @@ class Genome private(props: mutable.Map[String, Double]) {
 
     val bomb = new Bundle {
       val radius = (get("slave/bomb:radius", 0.15) * 7).toInt
-    }
-
-    val antibump = new Bundle {
-      val weight = get("slave/antibump:weight", 0.5)
     }
 
     val attack = new Bundle {
